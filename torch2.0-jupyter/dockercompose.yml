@@ -21,7 +21,7 @@ services:
     build:
       context: ./
       dockerfile: ./DOCKERFILE
-    working_dir: /projects
+    working_dir: /root/projects
     container_name: dl
     volumes: 
       - /c/Users/Mo/Documents/GitHub/Projects:/root/projects

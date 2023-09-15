@@ -21,13 +21,13 @@ services:
     build:
       context: ./
       dockerfile: ./DOCKERFILE
-    working_dir: /projects
+    working_dir: /root/projects
     container_name: dl
     volumes: 
-      - /c/Users/Mo/Documents/GitHub/Projects:/projects
+      - /c/Users/Mo/Documents/GitHub/Projects:/root/projects
       - /var/run/docker.sock:/var/run/docker.sock
-      - /c/Users/Mo/.ssh/:/home/root/.ssh/:ro
-      - /c/Users/Mo/.aws/:/home/root/.aws/:ro
+      - /c/Users/Mo/.ssh/:/root/.ssh/:ro
+      - /c/Users/Mo/.aws/:/root/.aws/:ro
 volumes:
   projects:
   docker:
