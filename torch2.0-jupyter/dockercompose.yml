@@ -1,0 +1,35 @@
+version: '3.0'
+services:
+  dl:
+    stdin_open: true  # docker run -i
+    tty: true        # docker run -t
+    user: root
+    # image: pytorch/pytorch:2.0.0-cuda11.7-cudnn8-devel
+    ports:
+      - 8888:8888
+      - 8000:8000
+      - 8890:8890
+    # change command 
+    # command: bash
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    build:
+      context: ./
+      dockerfile: ./DOCKERFILE
+    working_dir: /projects
+    container_name: dl
+    volumes: 
+      - /c/Users/Mo/Documents/GitHub/Projects:/root/projects
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /c/Users/Mo/.ssh/:/root/.ssh/:ro
+      - /c/Users/Mo/.aws/:/root/.aws/:ro
+volumes:
+  projects:
+  docker:
+  ssh:
+  aws:

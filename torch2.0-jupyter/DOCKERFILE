@@ -1,0 +1,33 @@
+ARG AWS_ACCOUNT_ID=$AWS_ACCOUNT_ID
+FROM ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/pytorch-training:2.0.1-gpu-py310-cu118-ubuntu20.04-ec2
+ 
+RUN pip install jupyterlab 
+RUN apt update && apt install -y curl tmux
+
+FROM base as builder
+
+# install deps 
+COPY environment.yml requirements.txt ./
+RUN conda env create -f environment.yml
+RUN apt update && apt install nodejs npm ffmpeg libsm6 libxext6 graphviz protobuf-compiler -y && apt autoremove -y 
+SHELL ["conda", "run", "-n", "dl", "/bin/bash", "-c"]
+# install python deps and update all in 'default' environment
+RUN pip install -r requirements.txt
+
+FROM builder as runner 
+
+# Required to run jupyter process successfully in background
+ENV TINI_VERSION v0.6.0
+ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /usr/bin/tini
+RUN chmod +x /usr/bin/tini
+ENTRYPOINT ["/usr/bin/tini", "--"]
+# Update all python deps
+SHELL ["conda", "run", "-n", "dl", "/bin/bash", "-c"]
+RUN pip --disable-pip-version-check list --outdated --format=json | python -c "import json, sys; print('\n'.join([x['name'] for x in json.load(sys.stdin)]))" | xargs -n1 pip install -U
+
+WORKDIR /root/projects
+SHELL ["/bin/bash", "-c"]
+RUN echo "conda activate dl" > ~/.bashrc 
+CMD ["jupyter-lab", "--port" , "8888", "--no-browser" ,"--ip", "0.0.0.0", "--allow-root"]
+
+
