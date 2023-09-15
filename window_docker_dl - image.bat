@@ -1,1 +1,0 @@
-docker run -dit --privileged --name dl --gpus all -v /usr/Mo/Documents/GitHub/Projects:/projects -p 8000:8000 -p 8888:8888 -v /var/run/docker.sock:/var/run/docker.sock dl
