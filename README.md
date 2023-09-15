@@ -28,3 +28,5 @@ or
 $
 compose_docker.sh
 ```
+## Customization
+Change any of the ```dockercompose.yaml``` such as the ```volume``` mapping
