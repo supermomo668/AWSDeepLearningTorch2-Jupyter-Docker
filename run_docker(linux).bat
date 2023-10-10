@@ -1,1 +1,1 @@
-docker run -dit --name dl --gpus all -v /usr/Mo/Documents/GitHub/Projects:/projects -p 8000:8000 -p 8888:8888 -v /var/run/docker.sock:/var/run/docker.sock torch20-jupyterhub-dl
+docker run -dit --name dl -w /root/projects --gpus all -v %USERPROFILE%\Documents\GitHub\Projects:/root/projects -p 8000:8000 -p 8888-9000:8888-9000 -v /var/run/docker.sock:/var/run/docker.sock -v %USERPROFILE%\.ssh:/root/.ssh supermomo668/torch20-jupyter-dl:latest
