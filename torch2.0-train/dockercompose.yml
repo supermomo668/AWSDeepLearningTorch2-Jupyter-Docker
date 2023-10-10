@@ -4,13 +4,7 @@ services:
     stdin_open: true  # docker run -i
     tty: true        # docker run -t
     user: root
-    # image: pytorch/pytorch:2.0.0-cuda11.7-cudnn8-devel
-    ports:
-      - 8888:8888
-      - 8000:8000
-      - 8890:8890
-    # change command 
-    # command: bash
+    # change command + overlay2 storage drive (experimental, remove if failed)
     deploy:
       resources:
         reservations:
@@ -22,7 +16,7 @@ services:
       context: ./
       dockerfile: ./docker-common/DOCKERFILE
     working_dir: /root/projects
-    container_name: dl
+    container_name: dl-train
     # running in privileged
     privileged: true
     devices:
@@ -31,10 +25,9 @@ services:
       - FUSE_DEBUG=1
     volumes: 
       - /c/Users/Mo/Documents/GitHub/Projects:/root/projects
-      - //var/run/docker.sock://var/run/docker.sock
-      # - //./pipe/docker_engine:/var/run/docker.sock
-      - /c/Users/Mo/.ssh/:/root/.ssh/
-      - /c/Users/Mo/.aws/:/root/.aws/
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /c/Users/Mo/.ssh/:/root/.ssh/:ro
+      - /c/Users/Mo/.aws/:/root/.aws/:ro
 volumes:
   projects:
   docker:

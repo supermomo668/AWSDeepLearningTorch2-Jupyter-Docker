@@ -37,7 +37,7 @@ RUN pip --disable-pip-version-check list --outdated --format=json | python -c "i
 
 WORKDIR /root/projects
 SHELL ["/bin/bash", "-c"]
-RUN echo "conda activate dl" >> ~/.bashrc && conda init && . ~/.bashrc
+RUN echo '{"storage-driver": "overlay2"}' > /etc/docker/daemon.json && echo conda init && "conda activate dl" >> ~/.bashrc && . ~/.bashrc
 CMD ["jupyter", "lab", "--port" , "8888", "--no-browser" ,"--ip", "0.0.0.0", "--allow-root"]
 
 
