@@ -1,1 +1,0 @@
-docker-compose -f torch2.0-jupyter(hub)\dockercompose.yml --project-directory torch2.0-jupyter(hub) up --build --force-recreate -d

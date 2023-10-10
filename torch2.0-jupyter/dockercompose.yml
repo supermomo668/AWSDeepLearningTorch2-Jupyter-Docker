@@ -25,9 +25,10 @@ services:
     container_name: dl
     volumes: 
       - /c/Users/Mo/Documents/GitHub/Projects:/root/projects
-      - /var/run/docker.sock:/var/run/docker.sock
-      - /c/Users/Mo/.ssh/:/root/.ssh/:ro
-      - /c/Users/Mo/.aws/:/root/.aws/:ro
+      - //var/run/docker.sock://var/run/docker.sock
+      # - //./pipe/docker_engine:/var/run/docker.sock
+      - /c/Users/Mo/.ssh/:/root/.ssh/
+      - /c/Users/Mo/.aws/:/root/.aws/
 volumes:
   projects:
   docker:

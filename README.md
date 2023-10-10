@@ -15,8 +15,9 @@ aws-pytorch-training:2.0.1-cpu-py310-ubuntu20.04-ec2
 Everything in the base AWS AMI image 
 * Jupyter lab will spin up at localhost:8888
 * Conda environment ```dl``` will be created with Python3.11
-* Python pip packages will be updated in 'dl' upon run
-
+* Maps GPUs if available
+* System + Python pip packages will be updated in 'dl' upon run
+* Maps host docker into docker environment to avoid re-installation
 ## Usage
 Upon configuring , window or linux command is ready out of box. On windows:
 ```

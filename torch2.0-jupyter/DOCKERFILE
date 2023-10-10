@@ -1,15 +1,25 @@
 ARG AWS_ACCOUNT_ID=$AWS_ACCOUNT_ID
-FROM ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/pytorch-training:2.0.1-gpu-py310-cu118-ubuntu20.04-ec2
+# From hub: supermomo668/dev:aws-pytorch-training_2.0.1-cpu-py310-ubuntu20.04-ec2
+# From AWS: ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/pytorch-training:2.0.1-gpu-py310-cu118-ubuntu20.04-ec2
+FROM supermomo668/dev:aws-pytorch-training_2.0.1-cpu-py310-ubuntu20.04-ec2 AS base
  
 RUN pip install jupyterlab 
-RUN apt update && apt install -y curl tmux
+RUN apt update && apt install -y curl tmux 
+# && apt upgrade -y
 
 FROM base as builder
 
 # install deps 
+RUN apt update && apt install \
+	nodejs npm python-software-properties \
+	ffmpeg libsm6 libxext6 graphviz protobuf-compiler  \  
+	mysql-client curl wget docker.io -y && \
+	npm install -g npm@latest n npx && n stable && \
+	apt upgrade -y && apt autoremove -y 
+
+# Create conda virtual env
 COPY environment.yml requirements.txt ./
 RUN conda env create -f environment.yml
-RUN apt update && apt install nodejs npm ffmpeg libsm6 libxext6 graphviz protobuf-compiler -y && apt autoremove -y 
 SHELL ["conda", "run", "-n", "dl", "/bin/bash", "-c"]
 # install python deps and update all in 'default' environment
 RUN pip install -r requirements.txt
@@ -27,7 +37,7 @@ RUN pip --disable-pip-version-check list --outdated --format=json | python -c "i
 
 WORKDIR /root/projects
 SHELL ["/bin/bash", "-c"]
-RUN echo "conda activate dl" > ~/.bashrc 
-CMD ["jupyter-lab", "--port" , "8888", "--no-browser" ,"--ip", "0.0.0.0", "--allow-root"]
+RUN echo "conda activate dl" >> ~/.bashrc && conda init && . ~/.bashrc
+CMD ["jupyter", "lab", "--port" , "8888", "--no-browser" ,"--ip", "0.0.0.0", "--allow-root"]
 
 
