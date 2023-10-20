@@ -1,7 +1,8 @@
 name: dl
 channels:
   - conda-forge
+  - anaconda
 dependencies:
-  - python=3.11
+  - python=3.10
   - Flask==2.2.3
-  - networkx">=2.5"
+  - networkx

@@ -30,9 +30,9 @@ services:
     environment:
       - FUSE_DEBUG=1
     volumes: 
-      - /c/Users/Mo/Documents/GitHub/Projects:/root/projects
+      # extremely important `delegated` flag to support intensive I/O operations in environ
+      - /c/Users/Mo/Documents/GitHub/Projects:/root/projects:delegated
       - //var/run/docker.sock://var/run/docker.sock
-      # - //./pipe/docker_engine:/var/run/docker.sock
       - /c/Users/Mo/.ssh/:/root/.ssh/
       - /c/Users/Mo/.aws/:/root/.aws/
 volumes:

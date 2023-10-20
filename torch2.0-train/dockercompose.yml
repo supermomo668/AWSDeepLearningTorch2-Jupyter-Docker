@@ -4,7 +4,10 @@ services:
     stdin_open: true  # docker run -i
     tty: true        # docker run -t
     user: root
-    # change command + overlay2 storage drive (experimental, remove if failed)
+    privileged: true
+    # Allow container to access host port on gateway IP
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     deploy:
       resources:
         reservations:
@@ -12,19 +15,22 @@ services:
             - driver: nvidia
               count: 1
               capabilities: [gpu]
+        limits:
+          cpus: '0.5'
+          memory: 50G
     build:
       context: ./
       dockerfile: ./docker-common/DOCKERFILE
     working_dir: /root/projects
     container_name: dl-train
     # running in privileged
-    privileged: true
     devices:
       - /dev/fuse
     environment:
       - FUSE_DEBUG=1
     volumes: 
-      - /c/Users/Mo/Documents/GitHub/Projects:/root/projects
+      # extremely important `delegated` flag to support intensive I/O operations in environ
+      - /c/Users/Mo/Documents/GitHub/Projects:/root/projects:delegated
       - /var/run/docker.sock:/var/run/docker.sock
       - /c/Users/Mo/.ssh/:/root/.ssh/:ro
       - /c/Users/Mo/.aws/:/root/.aws/:ro

@@ -1,2 +1,3 @@
 #!/bin/bash
-docker-compose -f torch2.0-jupyter/dockercompose.yml --project-directory torch2.0-jupyter up --build -d
+name=torch2.0-jupyter
+docker-compose -f $name/dockercompose.yml --project-directory $name up -d

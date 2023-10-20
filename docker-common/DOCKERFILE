@@ -3,28 +3,33 @@ ARG AWS_ACCOUNT_ID=$AWS_ACCOUNT_ID
 # From AWS: ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/pytorch-training:2.0.1-gpu-py310-cu118-ubuntu20.04-ec2
 FROM supermomo668/dev:aws-pytorch-training_2.0.1-cpu-py310-ubuntu20.04-ec2 AS base
  
-RUN pip install jupyterlab 
-RUN apt update && apt install -y curl tmux 
-# && apt upgrade -y
+# install deps 
+RUN apt update && \
+	apt install nodejs \
+	ffmpeg libsm6 libxext6 graphviz protobuf-compiler  \
+	mysql-client curl tmux wget docker.io rsync zip unzip -y 
+# Install Ngrok
+RUN wget https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-amd64.tgz && \
+	curl -s https://ngrok-agent.s3.amazonaws.com/ngrok.asc | tee /etc/apt/trusted.gpg.d/ngrok.asc >/dev/null && \
+	echo "deb https://ngrok-agent.s3.amazonaws.com buster main" | tee /etc/apt/sources.list.d/ngrok.list && \
+	apt update --allow-insecure-repositories && apt install ngrok && \
+	rm ngrok-v3-stable-linux-amd64.tgz
+	
+RUN apt install npm -y && npm install -g npm@latest && apt upgrade -y && apt autoremove -y
 
+ENV INSTALL_SCRIPTS /tmp/scripts
+COPY cloud-tools-setup/* ${INSTALL_SCRIPTS}
+RUN echo "Run scripts installation ..." chmod +x ${INSTALL_SCRIPTS}/*.sh && \
+	${INSTALL_SCRIPTS}/gcp_install.sh && ${INSTALL_SCRIPTS}/storj_install.sh &&
+	
 FROM base as builder
 
-# install deps 
-RUN apt update && apt install \
-	nodejs npm python-software-properties \
-	ffmpeg libsm6 libxext6 graphviz protobuf-compiler  \  
-	mysql-client curl wget docker.io -y && \
-	npm install -g npm@latest n npx && n stable && \
-	apt upgrade -y && apt autoremove -y 
-
 # Create conda virtual env
-COPY environment.yml requirements.txt ./
+COPY docker-common/environment.yml docker-common/requirements.txt ./
 RUN conda env create -f environment.yml
 SHELL ["conda", "run", "-n", "dl", "/bin/bash", "-c"]
 # install python deps and update all in 'default' environment
 RUN pip install -r requirements.txt
-
-FROM builder as runner 
 
 # Required to run jupyter process successfully in background
 ENV TINI_VERSION v0.6.0
@@ -35,9 +40,9 @@ ENTRYPOINT ["/usr/bin/tini", "--"]
 SHELL ["conda", "run", "-n", "dl", "/bin/bash", "-c"]
 RUN pip --disable-pip-version-check list --outdated --format=json | python -c "import json, sys; print('\n'.join([x['name'] for x in json.load(sys.stdin)]))" | xargs -n1 pip install -U
 
+FROM builder as runner
+
 WORKDIR /root/projects
 SHELL ["/bin/bash", "-c"]
-RUN echo '{"storage-driver": "overlay2"}' > /etc/docker/daemon.json && echo conda init && "conda activate dl" >> ~/.bashrc && . ~/.bashrc
+RUN echo '{"storage-driver": "overlay2"}' > /etc/docker/daemon.json && conda init && echo "conda activate dl" >> ~/.bashrc && . ~/.bashrc
 CMD ["jupyter", "lab", "--port" , "8888", "--no-browser" ,"--ip", "0.0.0.0", "--allow-root"]
-
-
