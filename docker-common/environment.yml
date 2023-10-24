@@ -3,6 +3,9 @@ channels:
   - conda-forge
   - anaconda
 dependencies:
+  # Essential
   - python=3.10
   - Flask==2.2.3
-  - networkx
+  - ipykernel==6.25.2
+  # Additional package
+  # - networkx
