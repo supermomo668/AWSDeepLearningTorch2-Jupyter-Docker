@@ -39,6 +39,12 @@ matplotlib
 networkx
 numpy
 # DL Application dependencies =====================================
+# Llava
+gradio>=3.50.2
+sentencepiece>=0.1.99
+bitsandbytes>=0.41.1
+transformers>=4.34.1
+# 
 tensorboard>=2.12.0
 torch>=2.0.0
 torchserve
@@ -60,6 +66,7 @@ Werkzeug>=2.2.3
 fastapi>=0.103.2
 fastapi-cache2[redis]
 pymysql>=1.1.0
+# mysqlclient==2.2.1
 sqlalchemy>=2.0.21
 python-dotenv>=1.0.0
 super_gradients>=3.1.3

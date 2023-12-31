@@ -4,10 +4,10 @@ ARG AWS_ACCOUNT_ID=$AWS_ACCOUNT_ID
 FROM supermomo668/dev:aws-pytorch-training_2.0.1-cpu-py310-ubuntu20.04-ec2 AS base1
  
 # install deps 
-RUN apt update && \
+RUN apt update --fix-missing && \
 	apt install nodejs \
 	ffmpeg libsm6 libxext6 graphviz protobuf-compiler openjdk-8-jdk-headless -y
-RUN apt install	mysql-client curl tmux wget docker.io rsync zip unzip net-tools -y 
+RUN apt install python3-dev default-libmysqlclient-dev libssl-dev build-essential tmux wget docker.io rsync zip unzip net-tools  -y 
 	
 RUN apt install npm -y && npm install -g npm@latest && apt upgrade -y && apt autoremove -y
 
@@ -16,13 +16,13 @@ COPY cloud-tools-setup/* ${INSTALL_SCRIPTS}/
 
 FROM base1 AS  base2
 RUN echo "Run scripts installation ..." chmod +x ${INSTALL_SCRIPTS}/*.sh && \
-	${INSTALL_SCRIPTS}/gcp_install.sh && ${INSTALL_SCRIPTS}/storj_install.sh && ${INSTALL_SCRIPTS}/ngrok_install.sh 
-#  && ${INSTALL_SCRIPTS}/post_install_updates.sh
+	find ${INSTALL_SCRIPTS} -maxdepth 1 -type f -exec cmd option {} \; > results.out
+
 FROM base2 as builder
 
 # Create conda virtual env
 COPY docker-common/environment.yml docker-common/requirements.txt ./
-RUN conda env create -f environment.yml
+RUN conda update -n base -c defaults conda -y && conda install -c conda-forge jupyterlab -y && conda env create -f environment.yml
 SHELL ["conda", "run", "-n", "dl", "/bin/bash", "-c"]
 # install python deps and update all in 'default' environment
 RUN python -m pip install -U pip
@@ -35,7 +35,8 @@ RUN chmod +x /usr/bin/tini
 ENTRYPOINT ["/usr/bin/tini", "--"]
 # Update all python deps
 # SHELL ["conda", "run", "-n", "dl", "/bin/bash", "-c"]
-RUN pip3 --disable-pip-version-check list --outdated --format=json | python -c "import json, sys; print('\n'.join([x['name'] for x in json.load(sys.stdin)]))" | xargs -n1 pip install -U
+# Update all python modules
+# RUN pip list --outdated --format=freeze | grep -v '^\-e' | cut -d = -f 1 | xargs -n1 pip install -U 
 
 FROM builder as runner
 

@@ -1,0 +1,12 @@
+FROM ubuntu:latest AS base
+ 
+# install deps 
+RUN apt update && apt install nodejs \
+	ffmpeg libsm6 libxext6 graphviz protobuf-compiler -y
+RUN apt install	mysql-client curl tmux wget docker.io rsync zip unzip net-tools git -y  
+RUN apt autoremove --purge -y
+ENV INSTALL_SCRIPTS /tmp/scripts
+COPY cloud-tools-setup/* ${INSTALL_SCRIPTS}/
+
+RUN echo "Run scripts installation ..." chmod +x ${INSTALL_SCRIPTS}/*.sh && \
+	${INSTALL_SCRIPTS}/gcp_install.sh && ${INSTALL_SCRIPTS}/storj_install.sh && ${INSTALL_SCRIPTS}/ngrok_install.sh 

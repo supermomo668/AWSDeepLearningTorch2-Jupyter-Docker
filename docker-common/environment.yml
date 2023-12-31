@@ -8,4 +8,4 @@ dependencies:
   - Flask==2.2.3
   - ipykernel==6.25.2
   # Additional package
-  # - networkx
+  # - networkxx
