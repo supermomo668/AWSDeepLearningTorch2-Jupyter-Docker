@@ -25,7 +25,7 @@ Everything in the base AWS AMI image
 ## Usage
 ### TO-DOs
 * Good idea to mount your personal development directory to the container by modifying the  `mount` directory in the (docker-compose file)[https://github.com/supermomo668/AWSDeepLearningTorch2-Jupyter-Docker/blob/main/torch2.0-train/dockercompose.yml].
-* * Change the following
+  * Change the following to your usernames and/or directories:
   ```
       - /c/Users/Mo/Documents/GitHub/Projects:/root/projects:delegated
       - /c/Users/Mo/.ssh/:/root/.ssh/
