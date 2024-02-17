@@ -1,6 +1,10 @@
 # AWSDeepLearningTorch+Jupyter Docker Image
 
-## Pre-req
+# Pre-Reqs
+* Docker 24.0
+
+## Conditional Pre-req
+### AWS
 Instructions based on [AWS](https://github.com/aws/deep-learning-containers/blob/master/available_images.md)
 
 Validated AWS credentials to pull from AWS public repo via:
@@ -19,8 +23,23 @@ Everything in the base AWS AMI image
 * System + Python pip packages will be updated in 'dl' upon run
 * Maps host docker into docker environment to avoid re-installation
 ## Usage
-Upon configuring , window or linux command is ready out of box. On windows:
+### TO-DOs
+* Good idea to mount your personal development directory to the container by modifying the  `mount` directory in the (docker-compose file)[https://github.com/supermomo668/AWSDeepLearningTorch2-Jupyter-Docker/blob/main/torch2.0-train/dockercompose.yml].
+* * Change the following
+  ```
+      - /c/Users/Mo/Documents/GitHub/Projects:/root/projects:delegated
+      - /c/Users/Mo/.ssh/:/root/.ssh/
+      - /c/Users/Mo/.aws/:/root/.aws/
+  ```
+  
+
+Upon configuring , window or linux command is ready out of box by the command:
 ```
+docker-compose -f "torch2.0-train/dockercompose.yml" --project-directory . up -d --build
+```
+Or the scripts:
+Windows
+``` 
 >
 compose_docker_dl-windows.bat
 ```
