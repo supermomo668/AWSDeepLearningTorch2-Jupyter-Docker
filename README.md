@@ -3,8 +3,8 @@
 # Pre-Reqs
 * Docker 24.0
 
-## Conditional Pre-req
-### AWS
+### Conditional Pre-req
+**AWS**
 Instructions based on [AWS](https://github.com/aws/deep-learning-containers/blob/master/available_images.md)
 
 Validated AWS credentials to pull from AWS public repo via:
