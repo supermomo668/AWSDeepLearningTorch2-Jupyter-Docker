@@ -20,7 +20,7 @@ Everything in the base AWS AMI image
 * Conda environment ```dl``` will be created with Python3.11
 * Maps GPUs if available
 * System + Python pip packages will be updated in 'dl' upon run
-* Maps host docker into docker environment to avoid re-installation
+* Maps host docker into docker environment to communicate with host docker
 ## Usage
 ### TO-DOs
 * Good idea to mount your personal development directory to the container by modifying the  `mount` directory in the (docker-compose file)[https://github.com/supermomo668/AWSDeepLearningTorch2-Jupyter-Docker/blob/main/torch2.0-train/dockercompose.yml].
