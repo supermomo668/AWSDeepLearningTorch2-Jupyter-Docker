@@ -15,18 +15,23 @@ ENV INSTALL_SCRIPTS /tmp/scripts
 COPY cloud-tools-setup/* ${INSTALL_SCRIPTS}/
 
 FROM base1 AS  base2
-RUN echo "Run scripts installation ..." chmod +x ${INSTALL_SCRIPTS}/*.sh && \
-	find ${INSTALL_SCRIPTS} -maxdepth 1 -type f -exec cmd option {} \; > results.out
+RUN echo "Run scripts installation ..." && chmod +x ${INSTALL_SCRIPTS}/*.sh && \
+find ${INSTALL_SCRIPTS} -maxdepth 1 -type f -name "*.sh" -exec bash {} \; > results.out
 
 FROM base2 as builder
 
 # Create conda virtual env
-COPY docker-common/environment.yml docker-common/requirements.txt ./
-RUN conda update -n base -c defaults conda -y && conda install -c conda-forge jupyterlab -y && conda env create -f environment.yml
+COPY docker-common/*.yml docker-common/*.txt ./
+RUN conda update -n base -c defaults conda -y && conda install -c conda-forge jupyterlab -y
+RUN conda env create -f environment-dl.yml && conda env create -f environment-app.yml
+# Create 1st conda env: dl
 SHELL ["conda", "run", "-n", "dl", "/bin/bash", "-c"]
-# install python deps and update all in 'default' environment
-RUN python -m pip install -U pip
-RUN pip3 install -r requirements.txt
+	# install python deps and update all in 'default' environment
+# RUN python -m pip install -U pip && python -m pip install -r requirements-dl.txt
+# Create 2nd conda env: dl
+SHELL ["conda", "run", "-n", "app", "/bin/bash", "-c"]
+	# install python deps and update all in 'default' environment
+RUN python -m pip install -U pip && python -m pip install -r requirements-app.txt
 
 # Required to run jupyter process successfully in background
 ENV TINI_VERSION v0.6.0
