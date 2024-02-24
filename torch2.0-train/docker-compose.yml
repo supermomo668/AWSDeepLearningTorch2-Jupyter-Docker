@@ -1,6 +1,8 @@
 version: '3.0'
 services:
   dl:
+    logging:
+      driver: json-file
     stdin_open: true  # docker run -i
     tty: true        # docker run -t
     user: root
@@ -8,6 +10,8 @@ services:
     # Allow container to access host port on gateway IP
     extra_hosts:
       - "host.docker.internal:host-gateway"
+      # add kubernetes host:
+      - "kubernetes.docker.internal:host-gateway"
     deploy:
       resources:
         reservations:
@@ -15,25 +19,31 @@ services:
             - driver: nvidia
               count: 1
               capabilities: [gpu]
-        # limits:
-        #   cpus: '0.5'
-        #   memory: 50G
+        limits:
+          cpus: '1'
+          memory: 50G
     build:
       context: ./
-      dockerfile: ./ubuntu-dev/DOCKERFILE
+      dockerfile: ./docker-common/DOCKERFILE
+    # port forward needed when NOT in HOST network 
+    # ports:
+    #   - "8888:8888" 
     working_dir: /root/projects
-    container_name: ubuntu-dev
+    container_name: torch2-train
     # running in privileged
     devices:
       - /dev/fuse
     environment:
       - FUSE_DEBUG=1
     volumes: 
-      # extremely important `delegated` flag to support intensive I/O operations in environ
+      # May add`delegated` flag to support intensive I/O operations in environ
+        # e.g. /c/Users/Mo/Documents/GitHub/Projects:/root/projects:delegated
       - /c/Users/Mo/Documents/GitHub/Projects:/root/projects
       - /var/run/docker.sock:/var/run/docker.sock
       - /c/Users/Mo/.ssh/:/root/.ssh/
       - /c/Users/Mo/.aws/:/root/.aws/
+      # Kubernetes configuration
+      - /c/Users/Mo/.kube:/root/.kube/
 volumes:
   projects:
   docker:
