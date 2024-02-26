@@ -1,1 +1,1 @@
-docker-compose -f torch2.0-train\docker-compose.yml --project-directory . up -d --build
+docker compose -f torch2.0-train\docker-compose.yml --project-directory . up -d --build
